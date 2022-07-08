@@ -15,6 +15,9 @@ Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/jammy64"
   config.vm.provider :virtualbox
   config.vm.network "private_network", ip: "172.30.1.5"
+  if Vagrant.has_plugin?("vagrant-vbguest") then
+    config.vbguest.auto_update = false
+  end
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
@@ -49,7 +52,7 @@ Vagrant.configure("2") do |config|
    config.vm.provider "virtualbox" do |vb|
      # Display the VirtualBox GUI when booting the machine
      vb.gui = true
-
+     vb.customize ['modifyvm', :id, '--clipboard-mode', 'bidirectional']
   
      # Customize the amount of memory on the VM:
      vb.memory = "4096"
@@ -64,8 +67,9 @@ Vagrant.configure("2") do |config|
    config.vm.provision "shell", inline: <<-SHELL
     echo 'installing deps'
     apt-get update
-    apt-get install libsecret-1-0 -y
-    apt install unzip gdebi-core xinit -y
+    apt-get install xfce4 virtualbox-guest-dkms virtualbox-guest-utils virtualbox-guest-x11 libsecret-1-0 gdm -y
+    apt install unzip gdebi-core xinit xfce4-session -y
+    sudo sed -i 's/allowed_users=.*$/allowed_users=anybody/' /etc/X11/Xwrapper.config
     uuidgen > secret.txt
     mkdir exploit
     curl -L https://launcher.mojang.com/v1/objects/886945bfb2b978778c3a0288fd7fab09d315b25f/server.jar -o server.jar
@@ -83,8 +87,10 @@ Vagrant.configure("2") do |config|
     source /etc/profile
     echo 'starting minecraft server in the background'
     screen -d -m -S game bash -c "java -Xms1G -Xmx1G -jar ./server.jar --nogui && sed -i 's/false/true/' ./eula.txt && java -Xms1G -Xmx1G -jar ./server.jar --nogui"
-    gdebi Minecraft.deb
+    gdebi -n Minecraft.deb
     echo 'starting malicious JNDI server in background'
     screen -d -m -S killbox bash -c "cd exploit; java -jar JNDIExploit-1.2-SNAPSHOT.jar -i 172.30.1.5 -p 8888"
+    dpkg-reconfigure gdm
+    echo 'DONE'
    SHELL
 end
