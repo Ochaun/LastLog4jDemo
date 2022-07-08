@@ -16,7 +16,7 @@ Vagrant.configure("2") do |config|
   config.vm.provider :virtualbox
 
   #Put the repo in the box
-  config.vm.synced_folder "src/", "/srv/minecraft"
+  config.vm.synced_folder "./src/", "/srv/minecraft"
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
@@ -64,12 +64,15 @@ Vagrant.configure("2") do |config|
   # Ansible, Chef, Docker, Puppet and Salt are also available. Please see the
   # documentation for more information about their specific syntax and use.
    config.vm.provision "shell", inline: <<-SHELL
-    curl https://launcher.mojang.com/v1/objects/886945bfb2b978778c3a0288fd7fab09d315b25f/server.jar -o /srv/minecraft/
-    curl https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.121-1/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip -o /opt/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip -s
-     unzip /opt/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip && rm java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip
-     export JAVA_HOME=/opt/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64/bin
-     export PATH=$JAVA_HOME:$PATH
-     export PATH=$JAVA_HOME:$PATH >> /etc/profile
-     /srv/minecraft/start.sh
+    apt install unzip -y
+    curl -s -L https://launcher.mojang.com/v1/objects/886945bfb2b978778c3a0288fd7fab09d315b25f/server.jar -o /srv/minecraft/server.jar
+    curl -s -L https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.121-1/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip -o /usr/lib/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip
+    unzip -o /usr/lib/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip && rm /usr/lib/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip
+    export JAVA_HOME=/usr/lib/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64/bin
+    export PATH=$JAVA_HOME:$PATH
+    export JAVA_HOME=/usr/lib/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64/bin >> /etc/profile
+    export PATH=$JAVA_HOME:$PATH >> /etc/profile
+    source ~/.bashrc
+    java -Xms1G -Xmx1G -jar ./server.jar --nogui
    SHELL
 end
