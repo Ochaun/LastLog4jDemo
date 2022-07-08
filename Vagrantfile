@@ -15,9 +15,6 @@ Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/jammy64"
   config.vm.provider :virtualbox
 
-  #Put the repo in the box
-  config.vm.synced_folder "./src/", "/srv/minecraft"
-
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
@@ -65,14 +62,18 @@ Vagrant.configure("2") do |config|
   # documentation for more information about their specific syntax and use.
    config.vm.provision "shell", inline: <<-SHELL
     apt install unzip -y
-    curl -s -L https://launcher.mojang.com/v1/objects/886945bfb2b978778c3a0288fd7fab09d315b25f/server.jar -o /srv/minecraft/server.jar
-    curl -s -L https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.121-1/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip -o /usr/lib/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip
-    unzip -o /usr/lib/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip && rm /usr/lib/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip
+    uuidgen > secret.txt
+    curl -L https://launcher.mojang.com/v1/objects/886945bfb2b978778c3a0288fd7fab09d315b25f/server.jar -o server.jar
+    curl -L https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.121-1/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip -o java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip
+    unzip -o java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip && rm java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip
+    mv -f java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64/ /usr/lib/
     export JAVA_HOME=/usr/lib/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64/bin
     export PATH=$JAVA_HOME:$PATH
     export JAVA_HOME=/usr/lib/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64/bin >> /etc/profile
     export PATH=$JAVA_HOME:$PATH >> /etc/profile
     source ~/.bashrc
+    java -Xms1G -Xmx1G -jar ./server.jar --nogui
+    sed -i 's/false/true/' ./eula.txt
     java -Xms1G -Xmx1G -jar ./server.jar --nogui
    SHELL
 end
