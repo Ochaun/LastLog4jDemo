@@ -13,11 +13,10 @@ Vagrant.configure("2") do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
   config.vm.box = "ubuntu/jammy64"
+  config.vm.provider :virtualbox
 
-  # Disable automatic box update checking. If you disable this, then
-  # boxes will only be checked for updates when the user runs
-  # `vagrant box outdated`. This is not recommended.
-  # config.vm.box_check_update = false
+  #Put the repo in the box
+  config.vm.synced_folder "src/", "/srv/minecraft"
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
@@ -52,6 +51,7 @@ Vagrant.configure("2") do |config|
    config.vm.provider "virtualbox" do |vb|
      # Display the VirtualBox GUI when booting the machine
      vb.gui = true
+
   
      # Customize the amount of memory on the VM:
      vb.memory = "1024"
@@ -63,17 +63,13 @@ Vagrant.configure("2") do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Ansible, Chef, Docker, Puppet and Salt are also available. Please see the
   # documentation for more information about their specific syntax and use.
-  #
-  # https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.121-1/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip
-  # export JAVA_HOME=/opt/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64/bin
-  # export PATH=$JAVA_HOME:$PATH
-  # export PATH=$JAVA_HOME:$PATH >> /etc/profile
-  # https://dlcdn.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz
-  # tar xzvf apache-maven-3.8.6-bin.tar.gz
-  # apache-maven-3.8.6-bin.tar.gz
-  # mvn archetype:generate -DgroupId=com.mycompany.app -DartifactId=my-app -DarchetypeArtifactId=maven-archetype-quickstart -DarchetypeVersion=1.4 -DinteractiveMode=false
    config.vm.provision "shell", inline: <<-SHELL
-     apt-get update
-     apt-get install -y apache2
+    curl https://launcher.mojang.com/v1/objects/886945bfb2b978778c3a0288fd7fab09d315b25f/server.jar -o /srv/minecraft/
+    curl https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.121-1/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip -o /opt/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip -s
+     unzip /opt/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip && rm java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64.zip
+     export JAVA_HOME=/opt/java-1.8.0-openjdk-1.8.0.121-0.b13.el6_8.x86_64/bin
+     export PATH=$JAVA_HOME:$PATH
+     export PATH=$JAVA_HOME:$PATH >> /etc/profile
+     /srv/minecraft/start.sh
    SHELL
 end
