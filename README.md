@@ -19,10 +19,7 @@ Back in Dec 2021, when this exploit was taking off in the wild. I released a tut
 7. Sign into a [Mojang/Microsoft account](https://www.minecraft.net/en-us/mojang-account-move) before playing
 8.  Install 1.12.2 launcher
 ![ah](https://user-images.githubusercontent.com/11700790/178097587-12e07e10-5290-4e56-bbd9-8261f0eab68a.gif)
-
-9. Select **Multiplayer** and direct connect to **127.0.0.1**
-![Animation](https://user-images.githubusercontent.com/11700790/178096194-b83b36b0-5e6c-4ea4-8ebc-15d8cf2f22d4.gif)
-
+9. Select **Multiplayer** and direct connect to 
 10. Run the exploit in the game
 
 *Hint: This lab comes with the [feihong-cs/JNDIExploit](https://web.archive.org/web/20211213030144/https://github.com/feihong-cs/JNDIExploit) look at it to see how it's done. *
