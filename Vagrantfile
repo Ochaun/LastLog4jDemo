@@ -41,8 +41,10 @@ Vagrant.configure("2") do |config|
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", path: './src/dwn.sh'    
 
+  # Creating the flag for the lab
   config.vm.provision "shell", inline: <<-SHELL
     uuidgen > secret.txt
+    chmod 700 secret.txt
     mkdir exploit
   SHELL
 
