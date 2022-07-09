@@ -30,7 +30,7 @@ Vagrant.configure("2") do |config|
      vb.customize ['modifyvm', :id, '--clipboard-mode', 'bidirectional']
   
      # Customize the amount of memory on the VM:
-     vb.memory = "4096"
+     vb.memory = "5122"
    end
 
   # View the documentation for the provider you are using for more
@@ -39,16 +39,16 @@ Vagrant.configure("2") do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Ansible, Chef, Docker, Puppet and Salt are also available. Please see the
   # documentation for more information about their specific syntax and use.
-  config.vm.provision "shell", path: './src/dwn.sh'    
+  config.vm.provision "dwn", type: "shell", path: './src/dwn.sh'    
 
   # Creating the flag for the lab
-  config.vm.provision "shell", inline: <<-SHELL
+  config.vm.provision "io", type: "shell", inline: <<-SHELL
     uuidgen > secret.txt
     chmod 700 secret.txt
     mkdir exploit
   SHELL
 
-  config.vm.provision "shell", path: './src/curl.sh'
-  config.vm.provision "shell", path: './src/env.sh'
-  config.vm.provision "shell", run: "always", path: './src/serve.sh'
+  config.vm.provision "curl", type: "shell", path: './src/curl.sh'
+  config.vm.provision "env", type: "shell", path: './src/env.sh'
+  config.vm.provision "serve", type: "shell", run: "always", path: './src/serve.sh'
 end
