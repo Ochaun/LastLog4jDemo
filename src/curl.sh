@@ -1,7 +1,7 @@
 #!/bin/bash
 echo 'Download minecraft and exploit'
 # Java & Minecraft 
-curl -s -L https://launcher.mojang.com/v1/objects/d0caafb8438ebd206f99930cfaecfa6c9a13dca0/server.jar -o server.jar
+curl -s -L https://launcher.mojang.com/v1/objects/886945bfb2b978778c3a0288fd7fab09d315b25f/server.jar -o server.jar
 curl -s -L https://launcher.mojang.com/v1/objects/0f275bc1547d01fa5f56ba34bdc87d981ee12daf/client.jar -o client.jar
 curl -s -L https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.111-1/java-1.8.0-openjdk-1.8.0.111-0.b15.el6_8.x86_64.zip -o java-1.8.0-openjdk-1.8.0.111-0.b15.el6_8.x86_64.zip
 # sketchy exploit kit I found on Wayback machine
