@@ -30,7 +30,7 @@ Vagrant.configure("2") do |config|
      vb.customize ['modifyvm', :id, '--clipboard-mode', 'bidirectional']
   
      # Customize the amount of memory on the VM:
-     vb.memory = "5122"
+     vb.memory = "6144"
    end
 
   # View the documentation for the provider you are using for more
