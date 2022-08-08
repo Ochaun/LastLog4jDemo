@@ -1,4 +1,4 @@
-# -*- mode: ruby -*-
+0# -*- mode: ruby -*-
 # vi: set ft=ruby :
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
@@ -15,6 +15,7 @@ Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/bionic64"
   config.vm.provider :virtualbox
   config.vm.network "private_network", ip: "172.30.1.5"
+  config.vm.boot_timeout = 600
   if Vagrant.has_plugin?("vagrant-vbguest") then
     config.vbguest.auto_update = true
   end
@@ -30,9 +31,9 @@ Vagrant.configure("2") do |config|
      vb.customize ['modifyvm', :id, '--clipboard-mode', 'bidirectional']
 
   
-     # Customize the amount of memory on the VM:
-     vb.memory = "7168"
-     vb.cpus = "3"
+     # Throw RAM and cores into it until it turns on quickly
+     vb.memory = "16384"
+     vb.cpus = "8"
    end
 
   # View the documentation for the provider you are using for more
